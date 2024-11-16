@@ -11,6 +11,7 @@ import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { WagmiProvider } from "wagmi";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import AllMatches from "./pages/AllMatches.jsx";
+import MatchAndBet from "./pages/MatchAndBet.jsx";
 
 const chilizTestnet = {
   id: 88882,
@@ -51,7 +52,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/match",
-        element: <MatchBet />,
+        element: <MatchAndBet />,
       },
     ],
   },

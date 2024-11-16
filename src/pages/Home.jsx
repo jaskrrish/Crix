@@ -17,7 +17,7 @@ const Home = () => {
             Earn crypto rewards for correct predictions
           </p>
           <Link
-            to="/match"
+            to="/play"
             className="px-8 py-4 text-xl font-bold bg-purple-600 hover:bg-purple-700 transition-colors duration-300 rounded-full inline-block"
           >
             Start Playing

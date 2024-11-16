@@ -40,7 +40,7 @@ function MintRedeemInterface() {
     writeContract({
       abi: CONTRACT_ABI,
       address: CONTRACT_ADDRESS,
-      functionName: "convertCRCToEth",
+      functionName: "convertCRXToEth",
       args: [Web3.utils.toWei(ethAmount, "ether")],
     });
   };
@@ -50,10 +50,7 @@ function MintRedeemInterface() {
       <div className="mb-4">
         <label className="inline-flex items-center">
           <span className="ml-2">
-            Available CRX:{" "}
-            {CRXBalance
-              ? Web3.utils.fromWei(CRXBalance.toString(), "ether")
-              : "0"}
+            Available CRX: {Number(CRXBalance.data)}{" "}
           </span>
         </label>
       </div>
@@ -71,16 +68,13 @@ function MintRedeemInterface() {
           <div className="flex items-center mt-2">
             <input
               type="number"
-              placeholder="Enter the amount of CRX to mint"
+              placeholder="Enter the amount CRX to mint"
               className="p-2 border rounded mr-2 flex-grow text-black"
-              value={mintInput}
               onChange={(e) => setMintInput(e.target.value)}
-              min="0"
-              step="0.1"
             />
             <button
               onClick={() => handleMint(mintInput)}
-              className="p-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+              className="p-2 bg-green-500 text-white rounded"
             >
               Mint Coins
             </button>
@@ -95,24 +89,21 @@ function MintRedeemInterface() {
             checked={!isMinting}
             onChange={() => setIsMinting(false)}
           />
-          <span className="ml-2">Convert CRX to ETH</span>
+          <span className="ml-2">Redeem CHZ</span>
         </label>
         {!isMinting && (
           <div className="flex items-center mt-2">
             <input
               type="number"
-              placeholder="Enter the amount of CRX to convert"
+              placeholder="Enter the amount CHZ to redeem"
               className="p-2 border rounded mr-2 flex-grow text-black"
-              value={redeemInput}
               onChange={(e) => setRedeemInput(e.target.value)}
-              min="0"
-              step="0.1"
             />
             <button
               onClick={() => handleRedeem(redeemInput)}
-              className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              className="p-2 bg-blue-500 text-white rounded"
             >
-              Convert to ETH
+              Redeem
             </button>
           </div>
         )}

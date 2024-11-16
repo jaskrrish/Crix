@@ -1,35 +1,35 @@
 import React, { useState, useRef, useEffect } from "react";
-import MatchCard from "../components/MatchCard";
-import MintRedeemInterface from "../components/MintRedeemInterface";
 import { useReadContract, useWriteContract } from "wagmi";
-import { CONTRACT_ABI, CONTRACT_ADDRESS } from "../config";
 import Web3 from "web3";
-import YourBet from "../components/YourBet";
+import { CONTRACT_ABI, CONTRACT_ADDRESS } from "../config";
 import { dataEventEmitter, getGeneratedBetId } from "../data";
+import MintRedeemInterface from "../components/MintRedeemInterface";
+import YourBet from "../components/YourBet";
+import MatchCard from "../components/MatchCard";
 
-const TabButton = ({ title, selectedTab, setSelectedTab, tabName }) => (
-  <div
-    className="w-[33%] rounded-md p-1 cursor-pointer"
-    onClick={() => setSelectedTab(tabName)}
-  >
-    <p
-      className={`text-center text-white ${
-        selectedTab === tabName ? "bg-gray-700" : ""
+const TabButton = ({ icon, title, isActive, onClick }) => (
+  <button
+    onClick={onClick}
+    className={`flex items-center justify-center space-x-2 w-full py-2.5 text-sm font-medium leading-5 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white
+      ${
+        isActive
+          ? "bg-purple-700 shadow"
+          : "text-gray-300 hover:bg-gray-700 hover:text-white"
       }`}
-    >
-      {title}
-    </p>
-  </div>
+  >
+    {icon}
+    <span>{title}</span>
+  </button>
 );
 
-const MatchAndBet = () => {
+export default function MatchAndBet() {
   const [currentValues, setCurrentValues] = useState({
     currentBetId: getGeneratedBetId(),
     currentBall: 0,
     currentOver: 0,
   });
-  const [selectedTab, setSelectedTab] = useState("Next Bet");
-  const [betAmount, setBetAmount] = useState();
+  const [betAmount, setBetAmount] = useState("");
+  const [activeTab, setActiveTab] = useState("bet");
   const { writeContract, error, status } = useWriteContract();
 
   const totalBets = useReadContract({
@@ -38,7 +38,7 @@ const MatchAndBet = () => {
     functionName: "totalBets",
   });
 
-  const predictions = [4, 6, 10];
+  const predictions = [4, 6, 10]; // 10 represents Wicket
   const zones = Array.from({ length: 14 }, (_, i) => i + 1);
 
   let optId = 1;
@@ -67,10 +67,7 @@ const MatchAndBet = () => {
     };
 
     dataEventEmitter.on("update", handleUpdate);
-
-    return () => {
-      dataEventEmitter.off("update", handleUpdate);
-    };
+    return () => dataEventEmitter.off("update", handleUpdate);
   }, []);
 
   const handleSubmit = async (event) => {
@@ -114,129 +111,165 @@ const MatchAndBet = () => {
   };
 
   return (
-    <div className="flex w-full overflow-hidden pb-6 h-full bg-black">
-      <div className="w-[45%]">
+    <div className="flex w-full h-screen bg-gray-900 text-white overflow-hidden">
+      <div className="w-[45%] p-4 overflow-y-auto">
         <MatchCard />
       </div>
-      <div className="w-[55%] bg-black pr-3">
-        <div className="flex w-full bg-gray-900 mb-5 rounded-md">
+      <div className="w-[55%] p-4 overflow-y-auto">
+        <div className="flex space-x-1 rounded-xl bg-gray-800 p-1 mb-4">
           <TabButton
+            icon={
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            }
             title="Swap Coins"
-            selectedTab={selectedTab}
-            setSelectedTab={setSelectedTab}
-            tabName="Mint CRC"
+            isActive={activeTab === "swap"}
+            onClick={() => setActiveTab("swap")}
           />
-
           <TabButton
+            icon={
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+            }
             title="Place a Bet"
-            selectedTab={selectedTab}
-            setSelectedTab={setSelectedTab}
-            tabName="Next Bet"
+            isActive={activeTab === "bet"}
+            onClick={() => setActiveTab("bet")}
           />
-
           <TabButton
+            icon={
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                />
+              </svg>
+            }
             title="My Bets"
-            selectedTab={selectedTab}
-            setSelectedTab={setSelectedTab}
-            tabName="Your Bet"
+            isActive={activeTab === "mybets"}
+            onClick={() => setActiveTab("mybets")}
           />
         </div>
-        {selectedTab === "Mint CRC" && <MintRedeemInterface />}
-
-        {selectedTab === "Next Bet" && (
-          <div className="h-full bg-black text-white p-5 rounded-md">
-            <img
-              src={"./zones.png"}
-              alt="Zones"
-              className="mx-auto h-80 mb-5"
-            />
-            <form
-              className="space-y-4 bg-gray-800 p-6 rounded-lg"
-              onSubmit={handleSubmit}
-            >
-              <div className="grid grid-cols-2 gap-4">
+        <div className="mt-4">
+          {activeTab === "swap" && <MintRedeemInterface />}
+          {activeTab === "bet" && (
+            <div className="bg-gray-800 rounded-xl p-4 shadow-lg">
+              <img
+                src="./zones.png"
+                alt="Zones"
+                className="mx-auto h-[18rem] mb-5 rounded-lg"
+              />
+              {error && (
+                <div className="bg-red-500 text-white p-3 rounded-md mb-4">
+                  {error}
+                </div>
+              )}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      htmlFor="prediction"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Prediction
+                    </label>
+                    <select
+                      ref={predictionRef}
+                      id="prediction"
+                      required
+                      className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-purple-600"
+                    >
+                      <option value="">Select Prediction</option>
+                      <option value="4">Four</option>
+                      <option value="6">Six</option>
+                      <option value="W">Wicket</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="zone"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Zone
+                    </label>
+                    <select
+                      ref={zoneRef}
+                      id="zone"
+                      required
+                      className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-purple-600"
+                    >
+                      <option value="">Select Zone</option>
+                      {zones.map((zone) => (
+                        <option key={zone} value={zone}>
+                          Zone {zone}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
                 <div>
                   <label
-                    htmlFor="prediction"
-                    className="block text-sm font-medium text-white"
+                    htmlFor="betAmount"
+                    className="block text-sm font-medium mb-1"
                   >
-                    Prediction
+                    Bet Amount (CRX)
                   </label>
-                  <select
-                    ref={predictionRef}
-                    id="prediction"
+                  <input
+                    id="betAmount"
+                    type="number"
+                    step="0.000000000000000001"
+                    min="0"
+                    placeholder="Amount of CRX to bet"
+                    value={betAmount}
+                    onChange={(e) => setBetAmount(e.target.value)}
+                    className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-purple-600"
                     required
-                    className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-white"
-                  >
-                    <option value="">Select Prediction</option>
-                    <option value="4">Four</option>
-                    <option value="6">Six</option>
-                    <option value="W">Wicket</option>
-                  </select>
+                  />
                 </div>
-
-                <div>
-                  <label
-                    htmlFor="zone"
-                    className="block text-sm font-medium text-white"
-                  >
-                    Zone
-                  </label>
-                  <select
-                    ref={zoneRef}
-                    id="zone"
-                    required
-                    className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-white"
-                  >
-                    <option value="">Select Zone</option>
-                    <option value="1">Zone 1</option>
-                    <option value="2">Zone 2</option>
-                    <option value="3">Zone 3</option>
-                    <option value="4">Zone 4</option>
-                    <option value="5">Zone 5</option>
-                    <option value="6">Zone 6</option>
-                    <option value="7">Zone 7</option>
-                    <option value="8">Zone 8</option>
-                    <option value="9">Zone 9</option>
-                    <option value="10">Zone 10</option>
-                    <option value="11">Zone 11</option>
-                    <option value="12">Zone 12</option>
-                    <option value="13">Zone 13</option>
-                    <option value="14">Zone 14</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="zone"
-                  className="block text-sm font-medium text-white"
-                >
-                  Bet Amount
-                </label>
-                <input
-                  placeholder="Amount of CRC to bet"
-                  type="number"
-                  className="p-2 border rounded mt-1 flex-grow bg-gray-700 border-gray-300 text-white outline-none w-full"
-                  onChange={(e) => setBetAmount(e.target.value)}
-                />
-              </div>
-
-              <div>
                 <button
                   type="submit"
-                  className="w-full mt-1 font-bold px-4 py-2 border border-transparent text-sm tracking-wider rounded-md text-black bg-indigo-400 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  disabled={status === "pending"}
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  PLACE BET
+                  {status === "pending" ? "PLACING BET..." : "PLACE BET"}
                 </button>
-              </div>
-            </form>
-          </div>
-        )}
-        {selectedTab === "Your Bet" && <YourBet />}
+              </form>
+            </div>
+          )}
+          {activeTab === "mybets" && <YourBet />}
+        </div>
       </div>
     </div>
   );
-};
-
-export default MatchAndBet;
+}
