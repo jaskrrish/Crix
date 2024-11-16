@@ -9,51 +9,40 @@ function MintRedeemInterface() {
   const [mintInput, setMintInput] = useState(0);
   const [redeemInput, setRedeemInput] = useState(0);
 
-  const { writeContract } = useWriteContract();
+  const { writeContract, error } = useWriteContract();
 
-  const { data: CRXBalance } = useReadContract({
+  const CRXBalance = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
     functionName: "balanceOf",
     args: [account.address],
-    watch: true,
   });
 
   const handleMint = async (CRXAmount) => {
-    try {
-      if (!CRXAmount || CRXAmount <= 0) {
-        throw new Error("Please enter a valid amount");
-      }
-
-      console.log("check ");
-
-      writeContract({
-        abi: CONTRACT_ABI,
-        address: CONTRACT_ADDRESS,
-        functionName: "mintCoins",
-        args: [Web3.utils.toWei(String(CRXAmount), "ether")],
-        value: Web3.utils.toWei(String(CRXAmount / 1000), "ether"),
-      });
-    } catch (err) {
-      alert(err.message || "Transaction failed");
+    if (error) {
+      alert(error.shortMessage);
     }
+
+    writeContract({
+      abi: CONTRACT_ABI,
+      address: CONTRACT_ADDRESS,
+      functionName: "mintCoins",
+      args: [CRXAmount],
+      value: Web3.utils.toWei(CRXAmount / 1000, "ether"),
+    });
   };
 
-  const handleRedeem = async (CRXAmount) => {
-    try {
-      if (!CRXAmount || CRXAmount <= 0) {
-        throw new Error("Please enter a valid amount");
-      }
-
-      writeContract({
-        abi: CONTRACT_ABI,
-        address: CONTRACT_ADDRESS,
-        functionName: "convertCRXToEth", // Updated function name based on new ABI
-        args: [Web3.utils.toWei(String(CRXAmount), "ether")],
-      });
-    } catch (err) {
-      alert(err.message || "Transaction failed");
+  const handleRedeem = async (ethAmount) => {
+    if (error) {
+      alert(error.cause.reason);
     }
+
+    writeContract({
+      abi: CONTRACT_ABI,
+      address: CONTRACT_ADDRESS,
+      functionName: "convertCRCToEth",
+      args: [Web3.utils.toWei(ethAmount, "ether")],
+    });
   };
 
   return (

@@ -3,11 +3,9 @@ import { useReadContract, useWriteContract } from "wagmi";
 import Web3 from "web3";
 import { CONTRACT_ABI, CONTRACT_ADDRESS } from "../config";
 import { dataEventEmitter, getGeneratedBetId } from "../data";
-
-// Assume these components are defined elsewhere
-import MatchCard from "../components/MatchCard";
 import MintRedeemInterface from "../components/MintRedeemInterface";
 import YourBet from "../components/YourBet";
+import MatchCard from "../components/MatchCard";
 
 const TabButton = ({ icon, title, isActive, onClick }) => (
   <button
@@ -34,7 +32,7 @@ export default function Component() {
   const [activeTab, setActiveTab] = useState("swap");
   const { writeContract, error, status } = useWriteContract();
 
-  const { data: totalBets } = useReadContract({
+  const totalBets = useReadContract({
     abi: CONTRACT_ABI,
     address: CONTRACT_ADDRESS,
     functionName: "totalBets",
@@ -44,9 +42,17 @@ export default function Component() {
   const zones = Array.from({ length: 14 }, (_, i) => i + 1);
 
   let optId = 1;
-  const predictionZoneMap = predictions.flatMap((prediction) =>
-    zones.map((zone) => ({ optId: optId++, prediction, zone }))
-  );
+  const predictionZoneMap = [];
+
+  for (let prediction of predictions) {
+    for (let zone of zones) {
+      predictionZoneMap.push({
+        optId: optId++,
+        prediction,
+        zone,
+      });
+    }
+  }
 
   const predictionRef = useRef();
   const zoneRef = useRef();
@@ -67,25 +73,23 @@ export default function Component() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    try {
-      const betAmountInWei = Web3.utils.toBigInt(betAmount);
-      const selectedPrediction =
-        predictionRef.current.value === "W"
-          ? 10
-          : parseInt(predictionRef.current.value);
-      const selectedZone = parseInt(zoneRef.current.value);
+    const betAmountInWei = Web3.utils.toBigInt(betAmount);
+    const selectedPrediction =
+      predictionRef.current.value === "W"
+        ? 10
+        : parseInt(predictionRef.current.value);
+    const selectedZone = parseInt(zoneRef.current.value);
+    const selectedOption = predictionZoneMap.find(
+      (option) =>
+        option.prediction === selectedPrediction && option.zone === selectedZone
+    );
 
-      const selectedOption = predictionZoneMap.find(
-        (option) =>
-          option.prediction === selectedPrediction &&
-          option.zone === selectedZone
-      );
-
-      if (!selectedOption) {
-        throw new Error("Invalid prediction or zone selection");
+    if (selectedOption) {
+      if (error) {
+        alert(error.cause.reason);
       }
 
-      console.log(`Placing bet with ID: ${currentValues.currentBetId}`);
+      console.log(`BetId for bet : ${getGeneratedBetId()}`);
 
       writeContract({
         abi: CONTRACT_ABI,
@@ -93,7 +97,7 @@ export default function Component() {
         functionName: "bet",
         args: [
           betAmountInWei,
-          currentValues.currentBetId,
+          getGeneratedBetId(),
           selectedOption.optId,
           selectedZone,
           currentValues.currentOver,
@@ -101,9 +105,8 @@ export default function Component() {
           selectedPrediction,
         ],
       });
-    } catch (err) {
-      console.error("Bet placement failed:", err);
-      alert(err.message || "Failed to place bet. Please try again.");
+    } else {
+      alert("Options not selected");
     }
   };
 
@@ -187,6 +190,11 @@ export default function Component() {
                 alt="Zones"
                 className="mx-auto h-[18rem] mb-5 rounded-lg"
               />
+              {error && (
+                <div className="bg-red-500 text-white p-3 rounded-md mb-4">
+                  {error}
+                </div>
+              )}
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -235,11 +243,13 @@ export default function Component() {
                     htmlFor="betAmount"
                     className="block text-sm font-medium mb-1"
                   >
-                    Bet Amount
+                    Bet Amount (CRX)
                   </label>
                   <input
                     id="betAmount"
                     type="number"
+                    step="0.000000000000000001"
+                    min="0"
                     placeholder="Amount of CRX to bet"
                     value={betAmount}
                     onChange={(e) => setBetAmount(e.target.value)}
@@ -249,9 +259,10 @@ export default function Component() {
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105"
+                  disabled={status === "pending"}
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  PLACE BET
+                  {status === "pending" ? "PLACING BET..." : "PLACE BET"}
                 </button>
               </form>
             </div>
