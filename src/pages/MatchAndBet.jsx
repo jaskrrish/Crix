@@ -38,6 +38,8 @@ export default function MatchAndBet() {
     functionName: "totalBets",
   });
 
+  console.log(" :: totalBets :: ", totalBets);
+
   const predictions = [4, 6, 10]; // 10 represents Wicket
   const zones = Array.from({ length: 14 }, (_, i) => i + 1);
 

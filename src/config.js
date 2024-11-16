@@ -1,7 +1,13 @@
-export const CONTRACT_ADDRESS = "0x19b87eb8A93c9B16e519a4ED8f2cfC6Dc18fC141";
+export const CONTRACT_ADDRESS = "0xCC45D1b9c22b8cEf813bD7B38288ef572Ed175fe";
 export const CONTRACT_ABI = [
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "address",
+        name: "entropyAddress",
+        type: "address",
+      },
+    ],
     stateMutability: "nonpayable",
     type: "constructor",
   },
@@ -152,6 +158,29 @@ export const CONTRACT_ABI = [
       },
     ],
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint64",
+        name: "sequence",
+        type: "uint64",
+      },
+      {
+        internalType: "address",
+        name: "provider",
+        type: "address",
+      },
+      {
+        internalType: "bytes32",
+        name: "randomNumber",
+        type: "bytes32",
+      },
+    ],
+    name: "_entropyCallback",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -485,6 +514,19 @@ export const CONTRACT_ABI = [
   {
     inputs: [
       {
+        internalType: "bytes32",
+        name: "userRandomSeed",
+        type: "bytes32",
+      },
+    ],
+    name: "requestRandomNumber",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "uint256",
         name: "_betId",
         type: "uint256",
@@ -594,11 +636,6 @@ export const CONTRACT_ABI = [
         name: "_betId",
         type: "uint256",
       },
-      {
-        internalType: "uint256",
-        name: "_optionId",
-        type: "uint256",
-      },
     ],
     name: "uploadAnswerForBet",
     outputs: [],
@@ -668,5 +705,9 @@ export const CONTRACT_ABI = [
     ],
     stateMutability: "view",
     type: "function",
+  },
+  {
+    stateMutability: "payable",
+    type: "receive",
   },
 ];

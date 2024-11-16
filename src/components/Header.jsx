@@ -3,11 +3,9 @@ import { Link } from "react-router-dom";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useReadContract, useAccount } from "wagmi";
 import { CONTRACT_ABI, CONTRACT_ADDRESS } from "../config.js";
-import { cryckLogo } from "../assets";
 
 const Header = () => {
   const account = useAccount();
-
   const CRXBalance = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
@@ -30,7 +28,7 @@ const Header = () => {
           <div className="flex items-center space-x-6">
             <div className="hidden md:flex items-center space-x-4 text-gray-300">
               <Link
-                to="/matches"
+                to="/play"
                 className="hover:text-white transition-colors duration-200"
               >
                 Matches
