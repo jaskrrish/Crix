@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { response } from "../data";
 
-const MatchCard = () => {
+export default function MatchCard() {
   const [score, setScore] = useState("0/0");
   const [ballsLeft, setBallsLeft] = useState(62);
 
@@ -13,88 +13,84 @@ const MatchCard = () => {
         return;
       }
 
-      // Update state only if response[i] is defined
       if (response[i]) {
         setScore(response[i].score);
-        setBallsLeft(ballsLeft - 1);
+        setBallsLeft((prevBalls) => prevBalls - 1);
       }
 
       i += 1;
     }, 60000);
 
     return () => clearInterval(interval);
-  }, [ballsLeft]);
+  }, []);
 
   return (
-    <div className=" m-auto border-blue-900 border-solid border-[5px] rounded-[39px] w-[420px] max-md:mt-10">
-      <div className="bg-[#DC1313] flex m-4 mb-1 text-center text-white rounded-2xl w-20">
-        <div className="rounded-full bg-white animate-pulse w-[8px] h-[8px] m-2"></div>
-        <p className="font-Archivo font-bold uppercase">Live</p>
-      </div>
-      <div className="flex relative gap-0.5 mt-6 ml-6 max-md:mt-10 max-md:ml-2.5">
-        <div className="flex flex-col text-white">
-          <div className="flex gap-2.5">
-            <div className="flex flex-col whitespace-nowrap">
-              <div className="self-center text-2xl text-neutral-300 tracking-wide">
-                MI
-              </div>
-              <div className="mt-6 text-3xl font-Grotesk font-semibold tracking-[2.53px]">
-                {score}
-              </div>
-              <div className="mt-1.5 m-3 text-xl">9.4/20</div>
-            </div>
-            <div className="flex flex-col items-center my-auto font-bold text-center">
-              <div className="self-stretch text-xs">
-                Match 23 (Wankhede Stadium)
-              </div>
-              <div className="mt-7 text-sm font-light">
-                Need{" "}
-                {response[0].team1 &&
-                  score &&
-                  Number(response[0].team1.split("/")[0]) -
-                    Number(score.split("/")[0])}{" "}
-                runs in {ballsLeft} balls
-              </div>
-              <div className="m-3 text-xs">
-                Target :{" "}
-                {response[0].team1
-                  ? Number(response[0].team1.split("/")[0]) + 1
-                  : ""}
-              </div>
-            </div>
+    <div className="bg-gray-800 rounded-xl overflow-hidden shadow-lg max-w-md mx-auto">
+      <div className="bg-gradient-to-r from-purple-700 to-purple-900 p-4">
+        <div className="flex items-center space-x-2 mb-2">
+          <div className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center">
+            <div className="w-2 h-2 bg-white rounded-full mr-1 animate-pulse"></div>
+            LIVE
           </div>
-          <div className="mt-10 text-lg tracking-widest border-0 border-white border-solid max-md:mt-10">
-            Hardik Pandya*
-            <br />
-            Rohit Sharma
-          </div>
+          <div className="text-white text-sm">Match 23 (Wankhede Stadium)</div>
         </div>
-        <div className="flex flex-col self-start whitespace-nowrap text-neutral-300">
-          <div className="self-center text-2xl tracking-wide">GT</div>
-          <div className="mt-6 text-3xl font-Grotesk font-semibold text-white border-solid tracking-[2.53px]">
-            201/8
+        <div className="flex justify-between items-center text-white">
+          <div className="text-center">
+            <div className="text-3xl font-bold">MI</div>
+            <div className="text-4xl font-bold mt-2">{score}</div>
+            <div className="text-sm mt-1">9.4/20</div>
           </div>
-          <div className="mt-1.5 m-3 text-xl text-white">20/20</div>
-          <div className="mt-9 text-base tracking-widest text-right">
-            (32/22)
-            <br />
-            (45/21)
+          <div className="text-center">
+            <div className="text-lg font-semibold mb-2">VS</div>
+            <div className="text-sm">
+              Need{" "}
+              {response[0]?.team1 && score
+                ? Number(response[0].team1.split("/")[0]) -
+                  Number(score.split("/")[0])
+                : ""}{" "}
+              runs
+            </div>
+            <div className="text-sm mt-1">{ballsLeft} balls left</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold">GT</div>
+            <div className="text-4xl font-bold mt-2">201/8</div>
+            <div className="text-sm mt-1">20/20</div>
           </div>
         </div>
       </div>
-      <div className="flex relative flex-col px-12 pt-5 pb-7 mt-9 max-w-full text-white rounded-none border-t border-white border-solid w-[418px] max-md:px-5">
-        <div className="self-center text-3xl underline-offset-2 tracking-[2.26px]">
-          Commentary
+      <div className="p-4 bg-gray-900">
+        <div className="flex justify-between text-gray-300 mb-4">
+          <div>
+            <div className="font-semibold">Hardik Pandya*</div>
+            <div className="text-sm">(32/22)</div>
+          </div>
+          <div className="text-right">
+            <div className="font-semibold">Rohit Sharma</div>
+            <div className="text-sm">(45/21)</div>
+          </div>
         </div>
-        <div className="justify-center py-1.5 mt-6 text-md bg-black">
-          In an electrifying IPL clash, Bumrah&apos;s fiery delivery outfoxed
-          Dhoni, taking a slight edge. SKY, at slip, leapt with grace, snagging
-          the ball magnificently. The stadium erupted as this iconic MI vs CSK
-          moment unfolded, showcasing skill and intense rivalry in a heartbeat.
+        <div className="mt-4">
+          <h3 className="text-xl font-bold text-center text-purple-400 mb-2">
+            Commentary
+          </h3>
+          <p className="text-sm text-gray-300 bg-gray-800 p-3 rounded-lg">
+            In an electrifying IPL clash, Bumrah&apos;s fiery delivery outfoxed
+            Dhoni, taking a slight edge. SKY, at slip, leapt with grace,
+            snagging the ball magnificently. The stadium erupted as this iconic
+            MI vs CSK moment unfolded, showcasing skill and intense rivalry in a
+            heartbeat.
+          </p>
+        </div>
+      </div>
+      <div className="bg-gray-800 p-4">
+        <div className="text-center text-sm text-gray-400">
+          Target:{" "}
+          {response[0]?.team1
+            ? Number(response[0].team1.split("/")[0]) + 1
+            : ""}
         </div>
       </div>
     </div>
   );
-};
-
-export default MatchCard;
+}

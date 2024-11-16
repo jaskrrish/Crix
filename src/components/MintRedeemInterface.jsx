@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import Web3 from "web3";
 import { CONTRACT_ABI, CONTRACT_ADDRESS } from "../config.js";
 import { useReadContract, useWriteContract, useAccount } from "wagmi";
@@ -9,40 +9,51 @@ function MintRedeemInterface() {
   const [mintInput, setMintInput] = useState(0);
   const [redeemInput, setRedeemInput] = useState(0);
 
-  const { writeContract, error, status } = useWriteContract();
+  const { writeContract } = useWriteContract();
 
-  const CRXBalance = useReadContract({
+  const { data: CRXBalance } = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
     functionName: "balanceOf",
     args: [account.address],
+    watch: true,
   });
 
   const handleMint = async (CRXAmount) => {
-    if (error) {
-      alert(error.shortMessage);
-    }
+    try {
+      if (!CRXAmount || CRXAmount <= 0) {
+        throw new Error("Please enter a valid amount");
+      }
 
-    writeContract({
-      abi: CONTRACT_ABI,
-      address: CONTRACT_ADDRESS,
-      functionName: "mintCoins",
-      args: [CRXAmount],
-      value: Web3.utils.toWei(CRXAmount / 1000, "ether"),
-    });
+      console.log("check ");
+
+      writeContract({
+        abi: CONTRACT_ABI,
+        address: CONTRACT_ADDRESS,
+        functionName: "mintCoins",
+        args: [Web3.utils.toWei(String(CRXAmount), "ether")],
+        value: Web3.utils.toWei(String(CRXAmount / 1000), "ether"),
+      });
+    } catch (err) {
+      alert(err.message || "Transaction failed");
+    }
   };
 
-  const handleRedeem = async (ethAmount) => {
-    if (error) {
-      alert(error.cause.reason);
-    }
+  const handleRedeem = async (CRXAmount) => {
+    try {
+      if (!CRXAmount || CRXAmount <= 0) {
+        throw new Error("Please enter a valid amount");
+      }
 
-    writeContract({
-      abi: CONTRACT_ABI,
-      address: CONTRACT_ADDRESS,
-      functionName: "convertCRCToEth",
-      args: [Web3.utils.toWei(ethAmount, "ether")],
-    });
+      writeContract({
+        abi: CONTRACT_ABI,
+        address: CONTRACT_ADDRESS,
+        functionName: "convertCRXToEth", // Updated function name based on new ABI
+        args: [Web3.utils.toWei(String(CRXAmount), "ether")],
+      });
+    } catch (err) {
+      alert(err.message || "Transaction failed");
+    }
   };
 
   return (
@@ -50,7 +61,10 @@ function MintRedeemInterface() {
       <div className="mb-4">
         <label className="inline-flex items-center">
           <span className="ml-2">
-            Available CRC: {Number(CRXBalance.data)}{" "}
+            Available CRX:{" "}
+            {CRXBalance
+              ? Web3.utils.fromWei(CRXBalance.toString(), "ether")
+              : "0"}
           </span>
         </label>
       </div>
@@ -62,19 +76,22 @@ function MintRedeemInterface() {
             checked={isMinting}
             onChange={() => setIsMinting(true)}
           />
-          <span className="ml-2">Mint CRC</span>
+          <span className="ml-2">Mint CRX</span>
         </label>
         {isMinting && (
           <div className="flex items-center mt-2">
             <input
               type="number"
-              placeholder="Enter the amount CRC to mint"
+              placeholder="Enter the amount of CRX to mint"
               className="p-2 border rounded mr-2 flex-grow text-black"
+              value={mintInput}
               onChange={(e) => setMintInput(e.target.value)}
+              min="0"
+              step="0.1"
             />
             <button
               onClick={() => handleMint(mintInput)}
-              className="p-2 bg-green-500 text-white rounded"
+              className="p-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
             >
               Mint Coins
             </button>
@@ -89,21 +106,24 @@ function MintRedeemInterface() {
             checked={!isMinting}
             onChange={() => setIsMinting(false)}
           />
-          <span className="ml-2">Redeem CHZ</span>
+          <span className="ml-2">Convert CRX to ETH</span>
         </label>
         {!isMinting && (
           <div className="flex items-center mt-2">
             <input
               type="number"
-              placeholder="Enter the amount CHZ to redeem"
+              placeholder="Enter the amount of CRX to convert"
               className="p-2 border rounded mr-2 flex-grow text-black"
+              value={redeemInput}
               onChange={(e) => setRedeemInput(e.target.value)}
+              min="0"
+              step="0.1"
             />
             <button
               onClick={() => handleRedeem(redeemInput)}
-              className="p-2 bg-blue-500 text-white rounded"
+              className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
             >
-              Redeem
+              Convert to ETH
             </button>
           </div>
         )}
