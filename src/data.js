@@ -3,12 +3,13 @@ import { CONTRACT_ABI, CONTRACT_ADDRESS } from "./config";
 import EventEmitter from "events";
 const dataEventEmitter = new EventEmitter();
 
-const web3 = new Web3("https://rpc.ankr.com/chiliz.com");
+const web3 = new Web3("https://spicy-rpc.chiliz.com");
 const myContract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
 
 async function betIdToAddress(betId) {
   try {
     const address = await myContract.methods.checkBetsForBet(betId).call();
+    console.log("Address: ", address);
     return address;
   } catch (error) {
     console.error("Error fetching addresses for bet ID:", error);
@@ -39,6 +40,8 @@ async function uploadAnswerForBet(betId, optionId) {
   // Sign the transaction
   const signedTx = await web3.eth.accounts.signTransaction(tx, PRIVATE_KEY);
 
+  console.log("Signed transaction:", signedTx);
+
   // Send the signed transaction
   const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
 
@@ -52,6 +55,7 @@ export let generatedBetId = 35;
 export let generatedOver = 0;
 export let generatedBall = 0;
 let correctOptionId = Math.floor(Math.random() * 42) + 1;
+
 let score = 0;
 let wickets = 0;
 let genResponse = [];
@@ -96,6 +100,7 @@ function generateData() {
     resetMatchData();
   }
   correctOptionId = Math.floor(Math.random() * 42) + 1;
+  console.log(correctOptionId);
   const zone = zones[Math.floor(Math.random() * zones.length)];
   const prediction =
     predictions[Math.floor(Math.random() * predictions.length)];
@@ -112,7 +117,6 @@ function generateData() {
     prediction,
     commentary: "",
   };
-  console.log(correctOptionId);
 
   genResponse.push(data);
   if (genResponse.length > 25) {
@@ -138,7 +142,7 @@ setInterval(async () => {
   console.log("New interval");
   await uploadAnswerIfBet(getGeneratedBetId(), correctOptionId);
   generateData();
-}, 140000);
+}, 100000);
 
 export const response = genResponse;
 export { dataEventEmitter };
