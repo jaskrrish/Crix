@@ -32,19 +32,43 @@ export default function MatchAndBet() {
   const [activeTab, setActiveTab] = useState("bet");
   const { writeContract, error, status } = useWriteContract();
 
-  const totalBets = useReadContract({
+  const { data: totalBets } = useReadContract({
     abi: CONTRACT_ABI,
     address: CONTRACT_ADDRESS,
     functionName: "totalBets",
   });
 
-  console.log(" :: totalBets :: ", totalBets);
+  const [bets, setBets] = useState([]);
+
+  useEffect(() => {
+    const fetchBetDetails = async () => {
+      if (totalBets) {
+        const betDetailsPromises = [];
+        for (let i = 0; i < totalBets; i++) {
+          betDetailsPromises.push(
+            useReadContract({
+              address: CONTRACT_ADDRESS,
+              abi: CONTRACT_ABI,
+              functionName: "getBetDetails",
+              args: [i],
+            })
+          );
+        }
+        const betDetails = await Promise.all(betDetailsPromises);
+        setBets(betDetails);
+      }
+    };
+
+    fetchBetDetails();
+  }, [totalBets]);
 
   const predictions = [4, 6, 10]; // 10 represents Wicket
   const zones = Array.from({ length: 14 }, (_, i) => i + 1);
 
   let optId = 1;
   const predictionZoneMap = [];
+
+  console.log("predictions", predictionZoneMap);
 
   for (let prediction of predictions) {
     for (let zone of zones) {
@@ -269,7 +293,7 @@ export default function MatchAndBet() {
               </form>
             </div>
           )}
-          {activeTab === "mybets" && <YourBet />}
+          {activeTab === "mybets" && <YourBet bets={bets} />}
         </div>
       </div>
     </div>

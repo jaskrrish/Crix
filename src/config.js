@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = "0xCC45D1b9c22b8cEf813bD7B38288ef572Ed175fe";
+export const CONTRACT_ADDRESS = "0x8490BBa50F9c2955c091D7D9aA7C4768DF379D8f";
 export const CONTRACT_ABI = [
   {
     inputs: [
@@ -120,6 +120,62 @@ export const CONTRACT_ABI = [
       },
     ],
     name: "Approval",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint64",
+        name: "sequenceNumber",
+        type: "uint64",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "provider",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "bytes32",
+        name: "randomNumber",
+        type: "bytes32",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "finalNumber",
+        type: "uint256",
+      },
+    ],
+    name: "RandomNumberGenerated",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint64",
+        name: "sequenceNumber",
+        type: "uint64",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "provider",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "bytes32",
+        name: "userRandomNumber",
+        type: "bytes32",
+      },
+    ],
+    name: "RandomNumberRequested",
     type: "event",
   },
   {
@@ -397,6 +453,25 @@ export const CONTRACT_ABI = [
     inputs: [
       {
         internalType: "uint256",
+        name: "_betId",
+        type: "uint256",
+      },
+    ],
+    name: "checkBetsForBet",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
         name: "ethAmount",
         type: "uint256",
       },
@@ -414,6 +489,19 @@ export const CONTRACT_ABI = [
         internalType: "uint8",
         name: "",
         type: "uint8",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "entropy",
+    outputs: [
+      {
+        internalType: "contract IEntropy",
+        name: "",
+        type: "address",
       },
     ],
     stateMutability: "view",
@@ -515,7 +603,7 @@ export const CONTRACT_ABI = [
     inputs: [
       {
         internalType: "bytes32",
-        name: "userRandomSeed",
+        name: "userRandomNumber",
         type: "bytes32",
       },
     ],
@@ -636,6 +724,11 @@ export const CONTRACT_ABI = [
         name: "_betId",
         type: "uint256",
       },
+      {
+        internalType: "uint256",
+        name: "_optionId",
+        type: "uint256",
+      },
     ],
     name: "uploadAnswerForBet",
     outputs: [],
@@ -705,9 +798,5 @@ export const CONTRACT_ABI = [
     ],
     stateMutability: "view",
     type: "function",
-  },
-  {
-    stateMutability: "payable",
-    type: "receive",
   },
 ];
