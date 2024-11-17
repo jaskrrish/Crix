@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import {IEntropyConsumer} from "@pythnetwork/entropy-sdk-solidity/IEntropyConsumer.sol";
 import {IEntropy} from "@pythnetwork/entropy-sdk-solidity/IEntropy.sol";
 
-contract Cryck is ERC20, IEntropyConsumer {
+contract CriX is ERC20, IEntropyConsumer {
     struct Bet {
         bool isWon;
         uint256 betId;
