@@ -6,6 +6,11 @@ const dataEventEmitter = new EventEmitter();
 const web3 = new Web3("https://spicy-rpc.chiliz.com");
 const myContract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
 
+//TODO: configure sender address & private key
+const SENDER_ADDRESS = "0x6c714e0Edf877B0C8cCf5B5716f67Ca0ABC86f2A";
+const PRIVATE_KEY =
+  "f0f84b0db5941f3cb7c1ab0a92c15c4b1ccf33011ad341ecf7077d81914a58fa";
+
 async function betIdToAddress(betId) {
   try {
     const address = await myContract.methods.checkBetsForBet(betId).call();
@@ -16,11 +21,6 @@ async function betIdToAddress(betId) {
     return [];
   }
 }
-
-//TODO: configure sender address & private key
-const SENDER_ADDRESS = "0x6c714e0Edf877B0C8cCf5B5716f67Ca0ABC86f2A";
-const PRIVATE_KEY =
-  "f0f84b0db5941f3cb7c1ab0a92c15c4b1ccf33011ad341ecf7077d81914a58fa";
 
 async function uploadAnswerForBet(betId, optionId) {
   const nonce = await web3.eth.getTransactionCount(SENDER_ADDRESS, "latest"); // get the latest nonce
@@ -82,6 +82,49 @@ function resetMatchData() {
   generatedBall = 0;
 }
 
+async function generateRandomness() {
+  try {
+    const nonce = await web3.eth.getTransactionCount(SENDER_ADDRESS, "latest"); // get the latest nonce
+    const encodedABI = myContract.methods
+      .requestRandomNumber(Web3.utils.randomHex(32))
+      .encodeABI();
+    const gasPrice = await web3.eth.getGasPrice();
+    const tx = {
+      from: SENDER_ADDRESS,
+      to: CONTRACT_ADDRESS,
+      gas: 2000000,
+      gasPrice,
+      nonce: nonce,
+      data: encodedABI,
+    };
+
+    // Sign the transaction
+    const signedTx = await web3.eth.accounts.signTransaction(tx, PRIVATE_KEY);
+
+    console.log("Signed transaction:", signedTx);
+
+    // Send the signed transaction
+    const receipt = await web3.eth.sendSignedTransaction(
+      signedTx.rawTransaction
+    );
+
+    console.log("Transaction receipt:", receipt);
+
+    // Listen for the RandomNumberGenerated event
+    myContract.once("RandomNumberGenerated", (error, event) => {
+      if (error) {
+        console.error("Error in RandomNumberGenerated event:", error);
+      } else {
+        const randomNumber = event.returnValues.finalNumber;
+        console.log("Random number generated:", randomNumber);
+        // Use the random number as needed
+      }
+    });
+  } catch (error) {
+    console.error("Error generating randomness:", error);
+  }
+}
+
 function generateData() {
   const match = "MI vs CSK";
   const runs = Math.floor(Math.random() * 7);
@@ -100,7 +143,7 @@ function generateData() {
     resetMatchData();
   }
   correctOptionId = Math.floor(Math.random() * 42) + 1;
-  console.log(correctOptionId);
+  console.log("Random Value", correctOptionId);
   const zone = zones[Math.floor(Math.random() * zones.length)];
   const prediction =
     predictions[Math.floor(Math.random() * predictions.length)];
@@ -140,6 +183,7 @@ generateData();
 
 setInterval(async () => {
   console.log("New interval");
+  generateRandomness();
   await uploadAnswerIfBet(getGeneratedBetId(), correctOptionId);
   generateData();
 }, 140000);
