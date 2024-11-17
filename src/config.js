@@ -1,13 +1,7 @@
-export const CONTRACT_ADDRESS = "0x14df779451C8D64be3BaB4782c2D7560C720CEa3";
+export const CONTRACT_ADDRESS = "0x2F9fba0931C3a49D519D96F67e593B0887074a61";
 export const CONTRACT_ABI = [
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "entropyAddress",
-        type: "address",
-      },
-    ],
+    inputs: [],
     stateMutability: "nonpayable",
     type: "constructor",
   },
@@ -127,62 +121,6 @@ export const CONTRACT_ABI = [
     inputs: [
       {
         indexed: true,
-        internalType: "uint64",
-        name: "sequenceNumber",
-        type: "uint64",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "provider",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "bytes32",
-        name: "randomNumber",
-        type: "bytes32",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "finalNumber",
-        type: "uint256",
-      },
-    ],
-    name: "RandomNumberGenerated",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "uint64",
-        name: "sequenceNumber",
-        type: "uint64",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "provider",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "bytes32",
-        name: "userRandomNumber",
-        type: "bytes32",
-      },
-    ],
-    name: "RandomNumberRequested",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
         internalType: "address",
         name: "from",
         type: "address",
@@ -214,29 +152,6 @@ export const CONTRACT_ABI = [
       },
     ],
     stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint64",
-        name: "sequence",
-        type: "uint64",
-      },
-      {
-        internalType: "address",
-        name: "provider",
-        type: "address",
-      },
-      {
-        internalType: "bytes32",
-        name: "randomNumber",
-        type: "bytes32",
-      },
-    ],
-    name: "_entropyCallback",
-    outputs: [],
-    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -495,19 +410,6 @@ export const CONTRACT_ABI = [
     type: "function",
   },
   {
-    inputs: [],
-    name: "entropy",
-    outputs: [
-      {
-        internalType: "contract IEntropy",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [
       {
         internalType: "address",
@@ -565,7 +467,7 @@ export const CONTRACT_ABI = [
             type: "uint256",
           },
         ],
-        internalType: "struct Crix.Bet[]",
+        internalType: "struct CriXX.Bet[]",
         name: "bets",
         type: "tuple[]",
       },
@@ -597,19 +499,6 @@ export const CONTRACT_ABI = [
       },
     ],
     stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "bytes32",
-        name: "userRandomNumber",
-        type: "bytes32",
-      },
-    ],
-    name: "requestRandomNumber",
-    outputs: [],
-    stateMutability: "payable",
     type: "function",
   },
   {

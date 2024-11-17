@@ -142,7 +142,7 @@ setInterval(async () => {
   console.log("New interval");
   await uploadAnswerIfBet(getGeneratedBetId(), correctOptionId);
   generateData();
-}, 100000);
+}, 140000);
 
 export const response = genResponse;
 export { dataEventEmitter };
